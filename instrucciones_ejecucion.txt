@@ -2,7 +2,7 @@ PRACTICA 1 - VERSION SECUENCIAL
 APAREAMIENTO EN GRAFOS
 
 Archivos entregados:
-- sequential_graph_matching.c
+- grafo_secuencial_aleatorio.c
 - instrucciones_ejecucion.txt
 
 --------------------------------------------------
@@ -32,10 +32,10 @@ aparecer en mas de una arista del mismo conjunto.
 EJECUCION EN GCC 
 --------------------------------------------------
 Compilar:
-    gcc grafo_secuencial.c -o grafo_secuencial
+    gcc grafo_secuencial_aleatorio.c -o grafo_secuencial_aleatorio
 
 Ejecutar en Linux / Git Bash / WSL:
-    ./grafo_secuencial
+    ./grafo_secuencial_aleatorio
 
 --------------------------------------------------
 4. SALIDA ESPERADA
