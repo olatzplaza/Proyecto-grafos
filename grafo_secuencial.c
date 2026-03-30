@@ -13,14 +13,18 @@
        ./grafo_secuencial
 */
 
-#define N 5
-#define MAX_EDGES (N * (N - 1) / 2)
+#define N 5 // Numero de nodos en el grafo
+#define MAX_EDGES (N * (N - 1) / 2) // Numero maximo que puede tener un grafo no dirigido de N nodos, 
+// con N=5 es 10, osea que como maximo podra haber 10 aristas distintas.
 
+// Estructura para representar una arista del grafo, con los indices de los nodos que conecta:
 typedef struct {
     int u;
     int v;
-} Arista;
+} Arista; 
 
+
+// Funcion para convertir un numero a su representacion alfabetica (0->A, 1->B, ..., 25->Z, 26->AA, etc.)
 void etiqueta(int n, char *resultado) {
     int i = 0;
 
@@ -38,6 +42,7 @@ void etiqueta(int n, char *resultado) {
     }
 }
 
+// Funcion para crear un grafo de ejemplo usando una matriz de adyacencia:
 void crear_grafo(int matriz[N][N]) {
     /*
        Grafo no dirigido de ejemplo.
@@ -66,6 +71,7 @@ void crear_grafo(int matriz[N][N]) {
     }
 }
 
+// Funcion para imprimir la matriz de adyacencia del grafo:
 void imprimir_grafo(int matriz[N][N]) {
     char nombre[10];
 
@@ -87,6 +93,7 @@ void imprimir_grafo(int matriz[N][N]) {
     }
 }
 
+// Funcion para obtener las aristas unicas del grafo a partir de la matriz de adyacencia:
 int obtener_aristas_unicas(int matriz[N][N], Arista aristas[]) {
     int total = 0;
 
@@ -103,6 +110,7 @@ int obtener_aristas_unicas(int matriz[N][N], Arista aristas[]) {
     return total;
 }
 
+// Funcion para imprimir las aristas del grafo:
 void imprimir_aristas(Arista aristas[], int total) {
     char a[10], b[10];
 
@@ -115,6 +123,7 @@ void imprimir_aristas(Arista aristas[], int total) {
     printf("Total de aristas unicas: %d\n", total);
 }
 
+// Funcion para imprimir un apareamiento dado un array de indices de aristas seleccionadas:
 void imprimir_apareamiento(Arista aristas[], int seleccion[], int tam) {
     char a[10], b[10];
 
@@ -130,6 +139,7 @@ void imprimir_apareamiento(Arista aristas[], int seleccion[], int tam) {
     printf(" }");
 }
 
+// Funcion recursiva para buscar todos los apareamientos posibles en el grafo usando backtracking:
 void buscar_apareamientos(
     Arista aristas[],
     int total_aristas,
@@ -195,6 +205,7 @@ void buscar_apareamientos(
     }
 }
 
+// Funcion para mostrar solo los apareamientos de tamano maximo encontrados:
 void mostrar_apareamientos_maximos(Arista aristas[], int total_aristas, int tam_objetivo) {
     int usados[N] = {0};
     int seleccion[MAX_EDGES];
