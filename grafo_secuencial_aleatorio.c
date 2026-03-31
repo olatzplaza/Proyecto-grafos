@@ -190,7 +190,7 @@ void buscar_apareamientos(
     }
 }
 
-// Funcion para mostrar solo los apareamientos de tamano maximo encontrados:
+// Funcion para mostrar solo los apareamientos de tamaño maximo encontrados:
 void mostrar_apareamientos_maximos(Arista aristas[], int total_aristas, int tam_objetivo) {
     int usados[N] = {0};
     int seleccion[MAX_EDGES];
@@ -204,7 +204,7 @@ void mostrar_apareamientos_maximos(Arista aristas[], int total_aristas, int tam_
 
     /*
        Pequeño backtracking iterativo para volver a recorrer y mostrar solo
-       los apareamientos de tamano maximo.
+       los apareamientos de tamaño maximo.
     */
     while (1) {
         while (indice < total_aristas) {
@@ -280,7 +280,7 @@ int main(void) {
 
     printf("\nRESUMEN\n");
     printf("Numero total de apareamientos no vacios: %d\n", total_apareamientos);
-    printf("Tamano del apareamiento maximo: %d\n", tam_maximo);
+    printf("Tamaño del apareamiento maximo: %d\n", tam_maximo);
     printf("Cantidad de apareamientos maximos: %d\n", total_maximos);
 
     printf("\nAPAREAMIENTOS MAXIMOS\n");
