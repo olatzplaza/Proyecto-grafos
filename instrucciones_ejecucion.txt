@@ -9,7 +9,7 @@ Archivos entregados:
 DESCRIPCION GENERAL
 --------------------------------------------------
 El programa trabaja con un grafo no dirigido representado mediante una matriz
-de adyacencia de tamano N x N.
+de adyacencia de tamaño N x N.
 
 En la matriz:
 - 1 indica que existe una arista entre dos nodos.
@@ -18,13 +18,14 @@ En la matriz:
 El programa realiza lo siguiente:
 1) Crea un grafo de ejemplo.
 2) Imprime la matriz de adyacencia.
-3) Obtiene las aristas unicas del grafo.
-4) Busca todos los apareamientos no vacios.
-5) Muestra el tamaño del apareamiento maximo.
-6) Muestra cuales son los apareamientos maximos.
+3) Obtiene las aristas únicas del grafo.
+4) Busca todos los apareamientos no vacíos.
+5) Muestra el tamaño del apareamiento máximo.
+6) Muestra cuales son los apareamientos máximos.
+Nota: Quisimos incluir lo de los apareamientos máximos, al ser esto un tema importante en el apareamiento de gráficos. Además visualmente, enriquece el entendimiento. 
 
 Importante:
-Un apareamiento es un conjunto de aristas en el que ningun vertice puede
+Un apareamiento es un conjunto de aristas en el que ningún vértice puede
 aparecer en mas de una arista del mismo conjunto.
 
 
@@ -38,22 +39,22 @@ Ejecutar en Linux / Git Bash / WSL:
     ./grafo_secuencial_aleatorio
 
 --------------------------------------------------
-4. SALIDA ESPERADA
+SALIDA ESPERADA
 --------------------------------------------------
 El programa mostrara:
 - La matriz del grafo.
 - Las aristas del grafo.
 - Todos los apareamientos encontrados.
 - Un resumen final.
-- Los apareamientos maximos.
+- Los apareamientos máximos.
 
 --------------------------------------------------
 NOTAS SOBRE LA IMPLEMENTACION
 --------------------------------------------------
-- Se ha usado una version secuencial, sin OpenMP y sin MPI.
-- El grafo se ha definido como no dirigido, por lo que la matriz es simetrica.
+- Se ha usado una versión secuencial, sin OpenMP y sin MPI.
+- El grafo se ha definido como no dirigido, por lo que la matriz es simétrica.
 - La diagonal principal siempre vale 0, porque no se consideran lazos.
 - Para evitar duplicados, las aristas se recorren solo por encima de la diagonal
   principal (j = i + 1).
-- La busqueda de apareamientos se hace con backtracking secuencial.
+- La búsqueda de apareamientos se hace con backtracking secuencial.
 
