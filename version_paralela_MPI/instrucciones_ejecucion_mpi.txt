@@ -1,0 +1,87 @@
+PRACTICA 3 - VERSION MPI
+APAREAMIENTO EN GRAFOS
+
+Integrantes
+MARIA ISABEL ARISTIZABAL
+OLATZ PLAZA
+
+Archivos entregados:
+- grafo_mpi_aleatorio.c
+- instrucciones_ejecucion_mpi.txt
+
+--------------------------------------------------
+DESCRIPCION GENERAL
+--------------------------------------------------
+
+El programa trabaja con un grafo no dirigido representado mediante una matriz
+de adyacencia de tamaño N x N.
+
+En la matriz:
+
+- 1 indica que existe una arista entre dos nodos.
+- 0 indica que no existe arista.
+
+El programa realiza lo siguiente:
+
+1. Crea un grafo de ejemplo.
+2. Imprime la matriz de adyacencia.
+3. Obtiene las aristas únicas del grafo.
+4. Busca todos los apareamientos no vacíos.
+5. Muestra el tamaño del apareamiento máximo.
+6. Muestra cuales son los apareamientos máximos.
+
+Nota:
+
+- Quisimos incluir lo de los apareamientos máximos, al ser esto un tema importante en el apareamiento de gráficos.
+  Además visualmente, enriquece el entendimiento.
+
+- La versión MPI mantiene el objetivo original de encontrar los apareamientos del grafo.
+  Sin embargo, para evitar conflictos y desorden en la salida por pantalla durante la ejecución distribuida,
+  la impresión detallada de todos los apareamientos fue sustituida por un resumen global y
+  la visualización de los apareamientos máximos encontrados.
+  El cálculo completo de los apareamientos sigue realizándose internamente.
+
+
+--------------------------------------------------
+EJECUCION EN MPI
+--------------------------------------------------
+
+Compilar:
+    mpicc grafo_mpi_aleatorio.c -o grafo_mpi_aleatorio
+
+
+Ejecutar en Linux / Git Bash / WSL:
+    mpirun -np 4 ./grafo_mpi_aleatorio
+
+
+Donde:
+- -np 4 indica el numero de procesos MPI que se utilizaran.
+- Puede modificarse dependiendo del numero de nucleos disponibles.
+
+--------------------------------------------------
+SALIDA ESPERADA
+--------------------------------------------------
+El programa mostrara:
+- La matriz del grafo.
+- Las aristas del grafo.
+- Todos los apareamientos encontrados.
+- Un resumen final.
+- Los apareamientos máximos.
+
+--------------------------------------------------
+NOTAS SOBRE LA IMPLEMENTACION
+--------------------------------------------------
+- Se ha utilizado MPI para distribuir el trabajo entre varios procesos.
+- El proceso 0 es el encargado de crear el grafo e imprimir los resultados.
+- El grafo generado se comparte al resto de procesos mediante `MPI_Bcast`.
+- Cada proceso explora una parte distinta del árbol de backtracking.
+- El reparto del trabajo se hace distribuyendo las aristas iniciales entre procesos.
+- Cada proceso calcula:
+  - su numero local de apareamientos,
+  - su tamaño máximo local,
+  - y su cantidad local de apareamientos máximos.
+- Los resultados globales se combinan mediante:
+  - MPI_Reduce
+  - MPI_Allreduce
+- El grafo se ha definido como no dirigido, por lo que la matriz es simétrica.
+- Para evitar duplicados, las aristas se recorren solo por encima de la diagonal principal (j = i + 1).
