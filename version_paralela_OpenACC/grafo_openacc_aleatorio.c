@@ -29,10 +29,7 @@ typedef struct {
     int v;
 } Arista;
 
-/*
-   Convierte un numero a formato alfabetico:
-   0 -> A, 1 -> B, ..., 25 -> Z, 26 -> AA, etc.
-*/
+
 void etiqueta(int n, char *resultado) {
     int i = 0;
 
