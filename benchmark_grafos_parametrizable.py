@@ -7,6 +7,7 @@ import time
 import shutil
 import argparse
 import subprocess
+from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
@@ -54,7 +55,18 @@ VERSIONES = {
 
 
 CARPETA_BUILD = Path("build_benchmark")
-CARPETA_RESULTADOS = Path("resultados")
+
+# Fecha y hora actual del experimento.
+timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+# Carpeta general.
+CARPETA_BASE_RESULTADOS = Path("resultados")
+
+# Carpeta especifica de este experimento.
+CARPETA_RESULTADOS = (
+    CARPETA_BASE_RESULTADOS /
+    f"experimento_{timestamp}"
+)
 
 
 # ==========================================================
@@ -109,8 +121,15 @@ REPETICIONES = args.repeticiones
 # ==========================================================
 
 def preparar_carpetas():
+
     CARPETA_BUILD.mkdir(exist_ok=True)
-    CARPETA_RESULTADOS.mkdir(exist_ok=True)
+
+    CARPETA_BASE_RESULTADOS.mkdir(exist_ok=True)
+
+    CARPETA_RESULTADOS.mkdir(
+        parents=True,
+        exist_ok=True
+    )
 
 
 def crear_fuente_temporal(src_original: Path, nombre_version: str, n: int) -> Path:
@@ -317,7 +336,7 @@ def generar_graficas(resumen):
         plt.xlabel("Nucleos / procesos")
         plt.ylabel("Speedup")
 
-        plt.title(f"Speedup para N={n}")
+        plt.title(f"Speedup para Nodos={n}")
 
         plt.legend()
 
