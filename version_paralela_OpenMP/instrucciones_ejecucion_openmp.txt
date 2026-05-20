@@ -26,11 +26,17 @@ El programa realiza lo siguiente:
 4) Busca todos los apareamientos no vacíos.
 5) Muestra el tamaño del apareamiento máximo.
 6) Muestra cuales son los apareamientos máximos.
-Nota: Quisimos incluir lo de los apareamientos máximos, al ser esto un tema importante en el apareamiento de gráficos. Además visualmente, enriquece el entendimiento. 
 
-Importante:
-Un apareamiento es un conjunto de aristas en el que ningún vértice puede
-aparecer en mas de una arista del mismo conjunto.
+Nota: 
+
+- Quisimos incluir lo de los apareamientos máximos, al ser esto un tema importante en el apareamiento de gráficos. 
+Además visualmente, enriquece el entendimiento. 
+
+- La versión OpenMP mantiene el objetivo original de encontrar los apareamientos del grafo. 
+Sin embargo, para evitar conflictos y desorden en la salida por pantalla durante la ejecución paralela, 
+la impresión detallada de todos los apareamientos fue sustituida por un resumen global y 
+la visualización de los apareamientos máximos encontrados. 
+El cálculo completo de los apareamientos sigue realizándose internamente.
 
 
 --------------------------------------------------

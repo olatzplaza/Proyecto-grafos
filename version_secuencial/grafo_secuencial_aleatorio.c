@@ -14,7 +14,7 @@
        ./grafo_secuencial_aleatorio
 */
 
-#define N 50 // Numero de nodos en el grafo
+#define N 5 // Numero de nodos en el grafo
 #define MAX_EDGES (N * (N - 1) / 2) // Numero maximo que puede tener un grafo no dirigido de N nodos, 
 // con N=5 es 10, osea que como maximo podra haber 10 aristas distintas.
 
