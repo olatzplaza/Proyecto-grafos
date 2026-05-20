@@ -1,0 +1,20 @@
+# Carpeta de compilacion de benchmarks
+build_benchmark/
+
+# Carpeta de resultados de experimentos
+resultados/
+
+# Ejecutables compilados
+*.exe
+*.out
+
+# Archivos temporales
+*.o
+*.obj
+
+# Configuracion de VSCode
+.vscode/
+
+# Cache de Python
+__pycache__/
+*.pyc
