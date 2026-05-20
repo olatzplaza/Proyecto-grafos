@@ -402,55 +402,6 @@ def guardar_resultados(df, resumen):
     print("\nArchivos guardados correctamente.")
 
 
-def subir_a_github():
-
-    """
-    Realiza automaticamente:
-    - git add
-    - git commit
-    - git push
-    """
-
-    try:
-
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-        mensaje_commit = (
-            f"Resultados benchmark {timestamp}"
-        )
-
-        print("\n================================")
-        print("SUBIENDO RESULTADOS A GITHUB")
-        print("================================")
-
-        subprocess.run(
-            ["git", "add", "."],
-            check=True
-        )
-
-        subprocess.run(
-            [
-                "git",
-                "commit",
-                "-m",
-                mensaje_commit
-            ],
-            check=True
-        )
-
-        subprocess.run(
-            ["git", "push"],
-            check=True
-        )
-
-        print("\nPush realizado correctamente.")
-
-    except Exception as e:
-
-        print("\nERROR realizando push automatico:")
-        print(e)
-
-
 # ==========================================================
 # MAIN
 # ==========================================================
@@ -558,8 +509,6 @@ def main():
     generar_graficas(resumen)
 
     print("\nBenchmark terminado.")
-
-    subir_a_github()
 
 
 if __name__ == "__main__":
