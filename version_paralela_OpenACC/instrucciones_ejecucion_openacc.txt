@@ -1,0 +1,100 @@
+PRACTICA 4 - VERSION OpenACC
+APAREAMIENTO EN GRAFOS
+
+Integrantes
+MARIA ISABEL ARISTIZABAL
+OLATZ PLAZA
+
+Archivos entregados:
+- grafo_openacc_aleatorio.c
+- instrucciones_ejecucion_openacc.txt
+
+--------------------------------------------------
+DESCRIPCION GENERAL
+--------------------------------------------------
+El programa trabaja con un grafo no dirigido representado mediante una matriz
+de adyacencia de tamaño N x N.
+
+En la matriz:
+- 1 indica que existe una arista entre dos nodos.
+- 0 indica que no existe arista.
+
+El programa realiza lo siguiente:
+1) Crea un grafo de ejemplo.
+2) Imprime la matriz de adyacencia.
+3) Obtiene las aristas únicas del grafo.
+4) Busca todos los apareamientos no vacíos.
+5) Muestra el tamaño del apareamiento máximo.
+6) Muestra cuales son los apareamientos máximos.
+
+Nota:
+
+- Quisimos incluir lo de los apareamientos máximos, al ser esto un tema importante en el apareamiento de grafos.
+Además visualmente, enriquece el entendimiento.
+
+- La versión OpenACC mantiene el objetivo original de encontrar los apareamientos del grafo.
+Sin embargo, para evitar sobrecarga de salida y facilitar la comparación con las versiones secuencial, OpenMP y MPI,
+la impresión detallada de todos los apareamientos fue sustituida por un resumen global y la visualización de los
+apareamientos máximos encontrados. El cálculo completo de los apareamientos sigue realizándose internamente.
+
+- En esta versión se utiliza OpenACC para ejecutar en GPU la comprobación de los subconjuntos de aristas. A diferencia
+de las versiones secuencial, OpenMP y MPI, aquí no se usa directamente el backtracking recursivo, porque la recursión no
+es la forma más adecuada de paralelizar en GPU con OpenACC. En su lugar, se enumeran en paralelo todos los subconjuntos
+posibles de aristas mediante máscaras de bits y se comprueba cuáles son apareamientos válidos.
+
+--------------------------------------------------
+REQUISITOS EN EL EQUIPO DEL AULA
+--------------------------------------------------
+Antes de compilar, comprobar que el equipo tiene GPU NVIDIA y CUDA instalado:
+
+    nvidia-smi
+
+Si se usa GCC con OpenACC, comprobar que está instalado el soporte de offload:
+
+    sudo apt install gcc-offload-nvptx
+
+Opcionalmente, para perfilar la ejecución:
+
+    nvprof ./grafo_openacc_aleatorio
+
+--------------------------------------------------
+EJECUCION EN GCC CON OpenACC
+--------------------------------------------------
+Compilar:
+
+    gcc -fopenacc -foffload=nvptx-none -fcf-protection=none -no-pie grafo_openacc_aleatorio.c -o grafo_openacc_aleatorio
+
+Ejecutar en Linux / Git Bash / WSL con acceso a GPU NVIDIA:
+
+    ./grafo_openacc_aleatorio
+
+Perfilar opcionalmente con nvprof:
+
+    nvprof ./grafo_openacc_aleatorio
+
+--------------------------------------------------
+SALIDA ESPERADA
+--------------------------------------------------
+El programa mostrara:
+- La matriz del grafo.
+- Las aristas del grafo.
+- Un resumen final.
+- Los apareamientos máximos.
+
+--------------------------------------------------
+NOTAS SOBRE LA IMPLEMENTACION
+--------------------------------------------------
+- Se ha utilizado OpenACC para paralelizar parte del algoritmo en GPU.
+- La paralelización se realiza con #pragma acc parallel loop.
+- Se utiliza #pragma acc data copyin(...) para copiar a la GPU los arreglos con los extremos de las aristas.
+- Se utilizan reducciones para acumular correctamente los resultados:
+    - reduction(+:total) para contar apareamientos.
+    - reduction(max:maximo) para obtener el tamaño máximo.
+    - reduction(+:maximos) para contar los apareamientos máximos.
+- Cada subconjunto de aristas se representa con una máscara de bits.
+- Cada iteración del bucle paralelo comprueba si una máscara representa un apareamiento válido.
+- Para comprobar si un subconjunto es válido, se usa una variable entera como máscara de vértices usados.
+- La impresión de resultados se mantiene secuencial para evitar sobrecarga y mantener una salida ordenada.
+- El grafo se ha definido como no dirigido, por lo que la matriz es simétrica.
+- Para evitar duplicados, las aristas se recorren solo por encima de la diagonal principal (j = i + 1).
+- Se usa una semilla fija, srand(1), para facilitar la comparación con las versiones secuencial, OpenMP y MPI.
