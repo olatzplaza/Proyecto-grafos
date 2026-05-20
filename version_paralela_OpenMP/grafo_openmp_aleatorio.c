@@ -11,7 +11,9 @@
 
    Compilar en GCC:
        gcc -fopenmp grafo_openmp_aleatorio.c -o grafo_openmp_aleatorio
-
+       
+   Opcional: export OMP_NUM_THREADS=4
+   
    Ejecutar en GCC:
        ./grafo_openmp_aleatorio
 */
