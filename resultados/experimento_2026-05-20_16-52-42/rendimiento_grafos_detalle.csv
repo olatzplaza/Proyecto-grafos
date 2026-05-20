@@ -1,0 +1,15 @@
+﻿version,N,nucleos,repeticion,tiempo_segundos,tiempo_minutos,ok,total_aristas,total_apareamientos,tam_maximo,total_maximos,comando
+secuencial,4,1,1,0.001230482001119526,2.05080333519921e-05,True,4,5,2,1,build_benchmark/secuencial_N4
+openmp,4,1,1,0.0020288660016376525,3.381443336062754e-05,True,4,5,2,1,build_benchmark/openmp_N4
+openmp,4,2,1,0.002288166000653291,3.8136100010888184e-05,True,4,5,2,1,build_benchmark/openmp_N4
+openmp,4,4,1,0.0026502399996388704,4.417066666064784e-05,True,4,5,2,1,build_benchmark/openmp_N4
+mpi,4,1,1,0.42009256099845516,0.007001542683307586,True,5,7,2,2,mpirun -np 1 build_benchmark/mpi_N4
+mpi,4,2,1,0.39149423300113995,0.0065249038833523326,True,5,7,2,2,mpirun -np 2 build_benchmark/mpi_N4
+mpi,4,4,1,0.4430491679995612,0.007384152799992686,True,5,7,2,2,mpirun -np 4 build_benchmark/mpi_N4
+secuencial,5,1,1,0.0013960120013507549,2.3266866689179246e-05,True,5,9,2,4,build_benchmark/secuencial_N5
+openmp,5,1,1,0.001282650999200996,2.1377516653349933e-05,True,5,9,2,4,build_benchmark/openmp_N5
+openmp,5,2,1,0.00211403700086521,3.5233950014420165e-05,True,5,9,2,4,build_benchmark/openmp_N5
+openmp,5,4,1,0.002152238001144724,3.587063335241207e-05,True,5,9,2,4,build_benchmark/openmp_N5
+mpi,5,1,1,0.33152813500055345,0.005525468916675891,True,7,15,2,8,mpirun -np 1 build_benchmark/mpi_N5
+mpi,5,2,1,0.34445544499976677,0.005740924083329446,True,7,15,2,8,mpirun -np 2 build_benchmark/mpi_N5
+mpi,5,4,1,0.40756737099945894,0.006792789516657649,True,7,15,2,8,mpirun -np 4 build_benchmark/mpi_N5
