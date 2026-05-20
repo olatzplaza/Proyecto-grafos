@@ -1,31 +1,36 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
+#include <omp.h>
 
 /*
    PROYECTO DE LA ASIGNATURA ARQUITECTURA DE ALTAS PRESTACIONES
-   PRACTICA 2 - VERSION OPENMP
+   PRACTICA 1 - VERSION OPENMP
    PROBLEMA: APAREAMIENTO EN GRAFOS
 
    Compilar en GCC:
-       gcc grafo_secuencial_aleatorio.c -o grafo_secuencial_aleatorio
+       gcc -fopenmp grafo_openmp_aleatorio.c -o grafo_openmp_aleatorio
 
    Ejecutar en GCC:
-       ./grafo_secuencial_aleatorio
+       ./grafo_openmp_aleatorio
 */
 
-#define N 5 // Numero de nodos en el grafo
-#define MAX_EDGES (N * (N - 1) / 2) // Numero maximo que puede tener un grafo no dirigido de N nodos, 
-// con N=5 es 10, osea que como maximo podra haber 10 aristas distintas.
+#define N 5
+#define MAX_EDGES (N * (N - 1) / 2)
+#define PROFUNDIDAD_CORTE 2
 
-// Estructura para representar una arista del grafo, con los indices de los nodos que conecta:
 typedef struct {
     int u;
     int v;
-} Arista; 
+} Arista;
 
+typedef struct {
+    int total_apareamientos;
+    int tam_maximo;
+    int total_maximos;
+} Resultado;
 
-// Funcion para convertir un numero a su representacion alfabetica (0->A, 1->B, ..., 25->Z, 26->AA, etc.)
 void etiqueta(int n, char *resultado) {
     int i = 0;
 
@@ -43,20 +48,18 @@ void etiqueta(int n, char *resultado) {
     }
 }
 
-// Funcion para crear un grafo aleatorio no dirigido usando una matriz de adyacencia:
 void crear_grafo(int matriz[N][N]) {
     for (int i = 0; i < N; i++) {
-        matriz[i][i] = 0;  // No se permiten lazos
+        matriz[i][i] = 0;
 
         for (int j = i + 1; j < N; j++) {
-            int valor = rand() % 2;   // 0 o 1 aleatorio
+            int valor = rand() % 2;
             matriz[i][j] = valor;
-            matriz[j][i] = valor;     // Garantiza simetria
+            matriz[j][i] = valor;
         }
     }
 }
 
-// Funcion para imprimir la matriz de adyacencia del grafo:
 void imprimir_grafo(int matriz[N][N]) {
     char nombre[10];
 
@@ -78,7 +81,6 @@ void imprimir_grafo(int matriz[N][N]) {
     }
 }
 
-// Funcion para obtener las aristas unicas del grafo a partir de la matriz de adyacencia:
 int obtener_aristas_unicas(int matriz[N][N], Arista aristas[]) {
     int total = 0;
 
@@ -95,7 +97,6 @@ int obtener_aristas_unicas(int matriz[N][N], Arista aristas[]) {
     return total;
 }
 
-// Funcion para imprimir las aristas del grafo:
 void imprimir_aristas(Arista aristas[], int total) {
     char a[10], b[10];
 
@@ -108,7 +109,6 @@ void imprimir_aristas(Arista aristas[], int total) {
     printf("Total de aristas unicas: %d\n", total);
 }
 
-// Funcion para imprimir un apareamiento dado un array de indices de aristas seleccionadas:
 void imprimir_apareamiento(Arista aristas[], int seleccion[], int tam) {
     char a[10], b[10];
 
@@ -124,65 +124,66 @@ void imprimir_apareamiento(Arista aristas[], int seleccion[], int tam) {
     printf(" }");
 }
 
-// Funcion recursiva para buscar todos los apareamientos posibles en el grafo usando backtracking:
-void buscar_apareamientos(
+void combinar_resultados(Resultado *global, Resultado local) {
+    #pragma omp critical
+    {
+        global->total_apareamientos += local.total_apareamientos;
+
+        if (local.tam_maximo > global->tam_maximo) {
+            global->tam_maximo = local.tam_maximo;
+            global->total_maximos = local.total_maximos;
+        } else if (local.tam_maximo == global->tam_maximo) {
+            global->total_maximos += local.total_maximos;
+        }
+    }
+}
+
+void buscar_apareamientos_secuencial(
     Arista aristas[],
     int total_aristas,
     int indice,
     int usados[],
     int seleccion[],
     int tam_seleccion,
-    int *total_apareamientos,
-    int *tam_maximo,
-    int *total_maximos
+    Resultado *res
 ) {
     if (indice == total_aristas) {
         if (tam_seleccion > 0) {
-            (*total_apareamientos)++;
+            res->total_apareamientos++;
 
-            printf("Apareamiento %d = ", *total_apareamientos);
-            imprimir_apareamiento(aristas, seleccion, tam_seleccion);
-            printf("\n");
-
-            if (tam_seleccion > *tam_maximo) {
-                *tam_maximo = tam_seleccion;
-                *total_maximos = 1;
-            } else if (tam_seleccion == *tam_maximo) {
-                (*total_maximos)++;
+            if (tam_seleccion > res->tam_maximo) {
+                res->tam_maximo = tam_seleccion;
+                res->total_maximos = 1;
+            } else if (tam_seleccion == res->tam_maximo) {
+                res->total_maximos++;
             }
         }
         return;
     }
 
-    /* Caso 1: no incluir la arista actual */
-    buscar_apareamientos(
+    buscar_apareamientos_secuencial(
         aristas,
         total_aristas,
         indice + 1,
         usados,
         seleccion,
         tam_seleccion,
-        total_apareamientos,
-        tam_maximo,
-        total_maximos
+        res
     );
 
-    /* Caso 2: incluir la arista actual si sus vertices no han sido usados */
     if (!usados[aristas[indice].u] && !usados[aristas[indice].v]) {
         usados[aristas[indice].u] = 1;
         usados[aristas[indice].v] = 1;
         seleccion[tam_seleccion] = indice;
 
-        buscar_apareamientos(
+        buscar_apareamientos_secuencial(
             aristas,
             total_aristas,
             indice + 1,
             usados,
             seleccion,
             tam_seleccion + 1,
-            total_apareamientos,
-            tam_maximo,
-            total_maximos
+            res
         );
 
         usados[aristas[indice].u] = 0;
@@ -190,7 +191,87 @@ void buscar_apareamientos(
     }
 }
 
-// Funcion para mostrar solo los apareamientos de tamaño maximo encontrados:
+void buscar_apareamientos_openmp(
+    Arista aristas[],
+    int total_aristas,
+    int indice,
+    int usados[],
+    int seleccion[],
+    int tam_seleccion,
+    int profundidad,
+    Resultado *global
+) {
+    if (indice == total_aristas || profundidad >= PROFUNDIDAD_CORTE) {
+        Resultado local = {0, 0, 0};
+        int usados_local[N];
+        int seleccion_local[MAX_EDGES];
+
+        memcpy(usados_local, usados, sizeof(int) * N);
+        memcpy(seleccion_local, seleccion, sizeof(int) * MAX_EDGES);
+
+        buscar_apareamientos_secuencial(
+            aristas,
+            total_aristas,
+            indice,
+            usados_local,
+            seleccion_local,
+            tam_seleccion,
+            &local
+        );
+
+        combinar_resultados(global, local);
+        return;
+    }
+
+    #pragma omp task default(none) firstprivate(total_aristas, indice, tam_seleccion, profundidad) shared(aristas, usados, seleccion, global)
+    {
+        int usados_no[N];
+        int seleccion_no[MAX_EDGES];
+
+        memcpy(usados_no, usados, sizeof(int) * N);
+        memcpy(seleccion_no, seleccion, sizeof(int) * MAX_EDGES);
+
+        buscar_apareamientos_openmp(
+            aristas,
+            total_aristas,
+            indice + 1,
+            usados_no,
+            seleccion_no,
+            tam_seleccion,
+            profundidad + 1,
+            global
+        );
+    }
+
+    if (!usados[aristas[indice].u] && !usados[aristas[indice].v]) {
+        #pragma omp task default(none) firstprivate(total_aristas, indice, tam_seleccion, profundidad) shared(aristas, usados, seleccion, global)
+        {
+            int usados_si[N];
+            int seleccion_si[MAX_EDGES];
+
+            memcpy(usados_si, usados, sizeof(int) * N);
+            memcpy(seleccion_si, seleccion, sizeof(int) * MAX_EDGES);
+
+            usados_si[aristas[indice].u] = 1;
+            usados_si[aristas[indice].v] = 1;
+            seleccion_si[tam_seleccion] = indice;
+
+            buscar_apareamientos_openmp(
+                aristas,
+                total_aristas,
+                indice + 1,
+                usados_si,
+                seleccion_si,
+                tam_seleccion + 1,
+                profundidad + 1,
+                global
+            );
+        }
+    }
+
+    #pragma omp taskwait
+}
+
 void mostrar_apareamientos_maximos(Arista aristas[], int total_aristas, int tam_objetivo) {
     int usados[N] = {0};
     int seleccion[MAX_EDGES];
@@ -202,10 +283,6 @@ void mostrar_apareamientos_maximos(Arista aristas[], int total_aristas, int tam_
     char a[10], b[10];
     int contador = 0;
 
-    /*
-       Pequeño backtracking iterativo para volver a recorrer y mostrar solo
-       los apareamientos de tamaño maximo.
-    */
     while (1) {
         while (indice < total_aristas) {
             if (!usados[aristas[indice].u] && !usados[aristas[indice].v] && tam < tam_objetivo) {
@@ -249,15 +326,13 @@ void mostrar_apareamientos_maximos(Arista aristas[], int total_aristas, int tam_
 
 int main(void) {
     srand(time(NULL));
-    
+
     int grafo[N][N];
     Arista aristas[MAX_EDGES];
     int total_aristas;
     int usados[N] = {0};
-    int seleccion[MAX_EDGES];
-    int total_apareamientos = 0;
-    int tam_maximo = 0;
-    int total_maximos = 0;
+    int seleccion[MAX_EDGES] = {0};
+    Resultado resultado = {0, 0, 0};
 
     crear_grafo(grafo);
     imprimir_grafo(grafo);
@@ -265,26 +340,30 @@ int main(void) {
     total_aristas = obtener_aristas_unicas(grafo, aristas);
     imprimir_aristas(aristas, total_aristas);
 
-    printf("\nAPAREAMIENTOS ENCONTRADOS\n");
-    buscar_apareamientos(
-        aristas,
-        total_aristas,
-        0,
-        usados,
-        seleccion,
-        0,
-        &total_apareamientos,
-        &tam_maximo,
-        &total_maximos
-    );
+    #pragma omp parallel
+    {
+        #pragma omp single
+        {
+            buscar_apareamientos_openmp(
+                aristas,
+                total_aristas,
+                0,
+                usados,
+                seleccion,
+                0,
+                0,
+                &resultado
+            );
+        }
+    }
 
     printf("\nRESUMEN\n");
-    printf("Numero total de apareamientos no vacios: %d\n", total_apareamientos);
-    printf("Tamaño del apareamiento maximo: %d\n", tam_maximo);
-    printf("Cantidad de apareamientos maximos: %d\n", total_maximos);
+    printf("Numero total de apareamientos no vacios: %d\n", resultado.total_apareamientos);
+    printf("Tamaño del apareamiento maximo: %d\n", resultado.tam_maximo);
+    printf("Cantidad de apareamientos maximos: %d\n", resultado.total_maximos);
 
     printf("\nAPAREAMIENTOS MAXIMOS\n");
-    mostrar_apareamientos_maximos(aristas, total_aristas, tam_maximo);
+    mostrar_apareamientos_maximos(aristas, total_aristas, resultado.tam_maximo);
 
     return 0;
 }
