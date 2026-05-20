@@ -1,9 +1,6 @@
 # Carpeta de compilacion de benchmarks
 build_benchmark/
 
-# Carpeta de resultados de experimentos
-resultados/
-
 # Ejecutables compilados
 *.exe
 *.out
