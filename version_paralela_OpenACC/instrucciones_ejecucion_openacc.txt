@@ -43,26 +43,176 @@ es la forma más adecuada de paralelizar en GPU con OpenACC. En su lugar, se enu
 posibles de aristas mediante máscaras de bits y se comprueba cuáles son apareamientos válidos.
 
 --------------------------------------------------
-REQUISITOS EN EL EQUIPO DEL AULA
+INSTALACIÓN Y CONFIGURACIÓN DE OPENACC EN LINUX MINT (CASA)
 --------------------------------------------------
-Antes de compilar, comprobar que el equipo tiene GPU NVIDIA y CUDA instalado:
+
+Este documento resume todos los pasos realizados para conseguir un entorno funcional de OpenACC con GPU NVIDIA en un ordenador personal con Linux Mint.
+
+------------------------
+1. PREPARACIÓN DEL SISTEMA
+------------------------
+
+Se partía de un sistema Linux Mint instalado en un equipo con particiones múltiples (Windows + Linux + disco de datos).
+
+Se verificó el hardware disponible:
+
+    lsblk -f
+    df -h
+
+Se identificó:
+- SSD principal con Linux Mint
+- Disco secundario “Almacenamiento” (NTFS) para datos
+- GPU NVIDIA GeForce GTX 1650
+
+------------------------
+2. BACKUP Y RESTAURACIÓN DE DATOS
+------------------------
+
+Se realizó copia de seguridad de datos personales usando rsync hacia un disco externo:
+
+    rsync -avh --progress /home/lierni /media/.../backup
+
+Problemas encontrados:
+- El USB se llenó completamente (No space left on device)
+- Se interrumpió la copia (Ctrl+C)
+- Se tuvo que reanudar y corregir el proceso
+
+Posteriormente se restauraron los datos desde el disco “Almacenamiento”:
+
+    rsync -avh --progress /media/lierni/Almacenamiento/backup-lierni/ /home/lierni/
+
+Resultado:
+- Backup completo restaurado (~73 GB)
+
+------------------------
+3. INSTALACIÓN DE DRIVERS NVIDIA
+------------------------
+
+Se instaló el driver recomendado para la GPU:
+
+    sudo ubuntu-drivers devices
+    sudo apt install nvidia-driver-595
+
+Verificación:
 
     nvidia-smi
 
-Si se usa GCC con OpenACC, comprobar que está instalado el soporte de offload:
+Resultado:
+- GPU detectada correctamente
+- Driver NVIDIA 595 funcionando
+- CUDA compatible reportado
 
-    sudo apt install gcc-offload-nvptx
+------------------------
+4. INSTALACIÓN DE CUDA
+------------------------
 
-Opcionalmente, para perfilar la ejecución:
+Se añadió el repositorio oficial de CUDA:
 
-    nvprof ./grafo_openacc_aleatorio
+    wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2404/x86_64/cuda-keyring_1.1-1_all.deb
+    sudo dpkg -i cuda-keyring_1.1-1_all.deb
+    sudo apt update
+    sudo apt install cuda-toolkit-13-2
+
+Se configuró el PATH:
+
+    export PATH=/usr/local/cuda/bin:$PATH
+    export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
+
+Verificación:
+
+    nvcc --version
+
+Resultado:
+- CUDA 13.2 instalado correctamente
+
+------------------------
+5. INSTALACIÓN DE NVIDIA HPC SDK (OPENACC)
+------------------------
+
+Se descargó el HPC SDK desde NVIDIA:
+
+    wget https://developer.download.nvidia.com/hpc-sdk/...
+    tar -xvf nvhpc_*.tar.gz
+    sudo ./install
+
+Instalación en:
+
+    /opt/nvidia/hpc_sdk
+
+Se configuró el entorno:
+
+    export PATH=/opt/nvidia/hpc_sdk/Linux_x86_64/26.3/compilers/bin:$PATH
+
+Verificación:
+
+    nvc --version
+
+Resultado:
+- NVIDIA HPC SDK 26.3 instalado correctamente
+- Compilador OpenACC funcional
+
+------------------------
+6. PROBLEMA CON GCC OPENACC
+------------------------
+
+Se intentó compilar con GCC:
+
+    gcc -fopenacc -foffload=nvptx-none ...
+
+Error:
+- Falta soporte "nvptx-none"
+- Falta mkoffload
+- GCC no configurado para GPU OpenACC
+
+Conclusión:
+- GCC OpenACC no funcional en este sistema
+- Se descarta su uso
+
+------------------------
+7. SOLUCIÓN FINAL (FUNCIONAL)
+------------------------
+
+Se adopta NVIDIA HPC SDK como herramienta principal:
+
+Compilación:
+
+    nvc -acc programa.c -o programa
+
+Ejecución:
+
+    ./programa
+
+Verificación de GPU:
+
+    nvidia-smi
+
+------------------------
+8. RESULTADO FINAL
+------------------------
+
+- Linux Mint funcionando correctamente
+- GPU NVIDIA GTX 1650 detectada
+- CUDA 13.2 instalado
+- NVIDIA HPC SDK instalado
+- OpenACC funcionando correctamente en GPU
+- Compilación con nvc operativa
+
+------------------------
+CONCLUSIÓN
+------------------------
+
+El entorno OpenACC queda completamente operativo en el ordenador personal,
+utilizando NVIDIA HPC SDK como compilador principal en lugar de GCC.
 
 --------------------------------------------------
-EJECUCION EN GCC CON OpenACC
+COMPILACIÓN DE PROGRAMAS OPENACC
 --------------------------------------------------
+
+En este equipo NO se utiliza GCC para OpenACC GPU.
+
 Compilar:
 
-    gcc -fopenacc -foffload=nvptx-none -fcf-protection=none -no-pie grafo_openacc_aleatorio.c -o grafo_openacc_aleatorio
+    nvc -acc grafo_openacc_aleatorio.c -o grafo_openacc_aleatorio
 
 Ejecutar en Linux / Git Bash / WSL con acceso a GPU NVIDIA:
 

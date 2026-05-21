@@ -8,7 +8,7 @@
    PROBLEMA: APAREAMIENTO EN GRAFOS
 
    Compilar en el equipo del aula con soporte OpenACC:
-       gcc -fopenacc -foffload=nvptx-none -fcf-protection=none -no-pie grafo_openacc_aleatorio.c -o grafo_openacc_aleatorio
+       nvc -acc grafo_openacc_aleatorio.c -o grafo_openacc_aleatorio
 
    Ejecutar:
        ./grafo_openacc_aleatorio
