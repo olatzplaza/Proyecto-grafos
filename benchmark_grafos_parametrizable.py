@@ -39,18 +39,16 @@ VERSIONES = {
         "compile_flags": [],
         "run_mode": "mpi"
     },
-
+     #-acc grafo_openacc_aleatorio.c -o grafo_openacc_aleatorio
     "openacc": {
         "src": "version_paralela_OpenACC/grafo_openacc_aleatorio.c",
-        "compiler": "gcc",
+        "compiler": "/opt/nvidia/hpc_sdk/Linux_x86_64/26.3/compilers/bin/nvc",
         "compile_flags": [
-            "-fopenacc",
-            "-foffload=nvptx-none",
-            "-fcf-protection=none",
-            "-no-pie"
+            "-acc"
         ],
         "run_mode": "openacc"
-    }
+}
+    
 }
 
 
@@ -202,7 +200,7 @@ def ejecutar(ejecutable: Path, run_mode: str, nucleos: int):
 
     elif run_mode == "openacc":
 
-        env["OMP_NUM_THREADS"] = str(nucleos)
+        #env["OMP_NUM_THREADS"] = str(nucleos)
 
         cmd = [str(ejecutable)]
 
