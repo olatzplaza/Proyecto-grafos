@@ -193,6 +193,7 @@ def ejecutar(ejecutable: Path, run_mode: str, nucleos: int):
 
         cmd = [
             "mpirun",
+            "--oversubscribe",
             "-np",
             str(nucleos),
             str(ejecutable)
